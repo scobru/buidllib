@@ -1,103 +1,68 @@
-# Coverage Report
+# @scobru/buidllib
 
-| Statements                                                                               | Functions                                                                              | Lines                                                                          |
-| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| ![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat) |
+Welcome to BuidlLib! This is a comprehensive library of smart contract utilities to assist in the development of Ethereum based applications.
 
-# Prerequisites
+## Features
 
-- Docker
+- **TokenChecker:** A utility contract that allows checking if a user holds or owns a certain amount of ERC20, ERC721 or ERC1155 tokens.
 
-```shell
-PATH+=":./bin"    # use your sh files (which are located in bin/) directly from the root of the project
+## Installation
+
+You can install the library via npm:
+
+```bash
+npm install @scobru/buidllib
 ```
 
-```shell
-./build.sh      # install solc and other tools in the docker image
-yarn install    # install deps
+## Usage
+
+### TokenChecker
+
+Here is how you can use the TokenChecker contract:
+
+
+```solidity
+pragma solidity ^0.8.19;
+
+import "@scobru/buidllib/contracts/utils/TokenChecker.sol";
+
+contract MyContract is TokenChecker {
+    // You can define a specific token address and minimum balance for this contract
+    address constant tokenAddress = 0xYourTokenAddress;
+    uint256 constant minBalance = 1000;
+
+    // You can check user token balance directly using functions from TokenChecker
+    function checkUserERC20Balance(address userAddress) public view returns (bool) {
+        return userHasERC20(tokenAddress, userAddress, minBalance);
+    }
+
+    // And similarly for ERC721 and ERC1155
+    function checkUserERC721Ownership(address userAddress, uint256 tokenId) public view returns (bool) {
+        return userOwnsERC721(tokenAddress, tokenId, userAddress);
+    }
+
+    function checkUserERC1155Balance(address userAddress, uint256 tokenId) public view returns (bool) {
+        return userHasERC1155(tokenAddress, tokenId, userAddress, minBalance);
+    }
+}
 ```
 
-Don't forget to copy the .env.example file to a file named .env, and then edit it to fill in the details.
+## Future Development
 
-# Running all the tests
+We aim to expand this library with more utility contracts in the future. Keep an eye on our release notes and documentation for updates.
 
-```shell
-yarn run test
-yarn run test:trace       # shows logs + calls
-yarn run test:fresh       # force compile and then run tests
-yarn run test:coverage    # run tests with coverage reports
-```
+## Contributing
 
-# Formatters & Linters
+We welcome contributions from the community. Here are steps to get started:
 
-You can use the below packages,
+1. Fork this repository.
+2. Create a new branch on your forked repository.
+3. Submit your changes through a pull request from your new branch to the main branch of the original repository.
 
-- Solhint
-- ESLint
-- Prettier
-- CSpell
-- ShellCheck
+Before making a pull request, please make sure your changes are well-documented and include relevant tests. 
 
-```shell
-yarn run format
-yarn run lint
-```
+## License
 
-# Analyzers
+This project is licensed under the MIT License. Check out the LICENSE file in the root directory for more details.
 
-You can use the below tools,
 
-- Slither
-- Mythril
-
-```shell
-yarn run analyze:static path/to/contract
-yarn run analyze:security path/to/contract
-yarn run analyze:all path/to/contract
-```
-
-# Deploy Contract & Verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details.
-
-- Enter your Etherscan API key
-- Ropsten node URL (eg from Alchemy)
-- The private key of the account which will send the deployment transaction.
-
-With a valid .env file in place, first deploy your contract:
-
-```shell
-yarn run deploy ropsten <CONTRACT_FILE_NAME>    # related to scripts/deploy/<CONTRACT_FILE_NAME>.ts
-yarn run deploy:all ropsten                     # related to scripts/deploy.ts
-```
-
-Also, you can add contract(s) manually to your tenderly projects from the output.
-`https://dashboard.tenderly.co/contract/<NETWORK_NAME>/<CONTRACT_ADDRESS>`
-
-And then verify it:
-
-```shell
-yarn run verify ropsten <DEPLOYED_CONTRACT_ADDRESS> "<CONSTRUCTOR_ARGUMENT(S)>"    # hardhat.config.ts to see all networks
-```
-
-# Miscellaneous
-
-```shell
-yarn run generate:docs    # generate docs. it checks to /contracts folder
-```
-
-```shell
-yarn run generate:flatten path/to/contract    # generate the flatten file
-yarn run generate:abi path/to/contract        # generate the ABI file
-yarn run generate:bin path/to/contract        # generate the binary in a hex
-```
-
-# TODO
-
-- Increase diversity in the Workshop Contract
-- Add npm scripts to linters
-- Add Workshop Contract tests
-- Add TSLint as a TypeScript linter
-- add TypeChain to Contract variables in the TypeScript files
