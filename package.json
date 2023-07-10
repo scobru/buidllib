@@ -1,9 +1,9 @@
 {
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "name": "@scobru/buidllib",
-  "description": "Solidity Hardhat TypeScript Boilerplate",
+  "description": "Smart Contracts Toolkit",
   "scripts": {
     "prepare": "husky install",
     "start": "hardhat node",
@@ -33,7 +33,7 @@
     "format:json": "prettier '**/{*,''}.json' --write; eslint '**/{*,''}.json' --fix;",
     "format:js": "prettier '**/{*,''}.js' --write; eslint '**/{*,''}.js' --fix;",
     "format:ts": "prettier '**/{*,''}.ts' --write; eslint '**/{*,''}.ts' --fix;",
-    "format:sol": "npx prettier '**/*.sol' --write; npx solhint 'contracts/*.sol' --fix;",
+    "format:sol": " prettier '**/*.sol' --write;  solhint 'contracts/*.sol' --fix;",
     "lint": "shellcheck bin/*; cspell lint --dot --gitignore '**/{*,''}{.,''}*'; prettier '**/{*,''}.{json,js,ts,sol}' --check; solhint 'contracts/*.sol'; eslint '**/{*,''}.{json,js,ts}';",
     "hook:pre-push": "tsc --noEmit && shellcheck bin/* && cspell lint --dot --gitignore '**/{*,''}{.,''}*' && prettier '**/{*,''}.{json,js,ts,sol}' --check && solhint 'contracts/*.sol' && eslint '**/{*,''}.{json,js,ts}'"
   },
