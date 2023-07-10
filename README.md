@@ -27,24 +27,25 @@ pragma solidity ^0.8.19;
 import "@scobru/buidllib/contracts/utils/TokenChecker.sol";
 
 contract MyContract is TokenChecker {
-    // You can define a specific token address and minimum balance for this contract
+    // Puoi definire un indirizzo di token specifico e un saldo minimo per questo contratto
     address constant tokenAddress = 0xYourTokenAddress;
     uint256 constant minBalance = 1000;
 
-    // You can check user token balance directly using functions from TokenChecker
+    // Puoi verificare direttamente il saldo del token dell'utente utilizzando le funzioni di TokenChecker
     function checkUserERC20Balance(address userAddress) public view returns (bool) {
-        return userHasERC20(tokenAddress, userAddress, minBalance);
+        return checkERC20Balance(tokenAddress, userAddress, minBalance);
     }
 
-    // And similarly for ERC721 and ERC1155
+    // E in modo simile per ERC721 e ERC1155
     function checkUserERC721Ownership(address userAddress, uint256 tokenId) public view returns (bool) {
-        return userOwnsERC721(tokenAddress, tokenId, userAddress);
+        return checkERC721Ownership(tokenAddress, tokenId, userAddress);
     }
 
     function checkUserERC1155Balance(address userAddress, uint256 tokenId) public view returns (bool) {
-        return userHasERC1155(tokenAddress, tokenId, userAddress, minBalance);
+        return checkERC1155Balance(tokenAddress, tokenId, userAddress, minBalance);
     }
 }
+
 ```
 
 ## Future Development
