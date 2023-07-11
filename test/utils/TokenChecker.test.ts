@@ -1,12 +1,25 @@
-import { ethers } from "hardhat";
-import { expect } from "chai";
+import { ethers } from 'hardhat';
+import { expect } from 'chai';
 
 describe('TokenChecker', function () {
-  let accounts: { address: any; }[],
-    tokenChecker: { checkERC20Balance: (arg0: any, arg1: any, arg2: any) => any; checkERC721Ownership: (arg0: any, arg1: number, arg2: any) => any; checkERC721Balance: (arg0: any, arg1: any, arg2: number) => any; checkERC1155Balance: (arg0: any, arg1: number, arg2: any, arg3: number) => any; },
-    mockERC20: { address: any; },
-    mockERC721: { mint: (arg0: any, arg1: number) => any; address: any; },
-    mockERC1155: { mint: (arg0: any, arg1: number, arg2: number, arg3: string) => any; address: any; };
+  let accounts: { address: any }[],
+    tokenChecker: {
+      checkERC20Balance: (arg0: any, arg1: any, arg2: any) => any;
+      checkERC721Ownership: (arg0: any, arg1: number, arg2: any) => any;
+      checkERC721Balance: (arg0: any, arg1: any, arg2: number) => any;
+      checkERC1155Balance: (
+        arg0: any,
+        arg1: number,
+        arg2: any,
+        arg3: number
+      ) => any;
+    },
+    mockERC20: { address: any },
+    mockERC721: { mint: (arg0: any, arg1: number) => any; address: any },
+    mockERC1155: {
+      mint: (arg0: any, arg1: number, arg2: number, arg3: string) => any;
+      address: any;
+    };
 
   before(async () => {
     accounts = await ethers.getSigners();
@@ -15,7 +28,10 @@ describe('TokenChecker', function () {
     tokenChecker = await TokenChecker.deploy();
 
     const MockERC20 = await ethers.getContractFactory('MockERC20');
-    mockERC20 = await MockERC20.deploy(accounts[0].address, ethers.utils.parseEther('1000'));
+    mockERC20 = await MockERC20.deploy(
+      accounts[0].address,
+      ethers.utils.parseEther('1000')
+    );
 
     const MockERC721 = await ethers.getContractFactory('MockERC721');
     mockERC721 = await MockERC721.deploy();

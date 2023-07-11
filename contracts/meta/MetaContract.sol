@@ -12,10 +12,10 @@ contract MetaContract {
 
     Execution[] public executions;
 
-    function executeFunction(
-        address target,
-        bytes memory txData
-    ) external returns (bytes memory) {
+    function executeFunction(address target, bytes memory txData)
+        external
+        returns (bytes memory)
+    {
         Execution memory execution = Execution(msg.sender, target, txData);
         executions.push(execution);
 

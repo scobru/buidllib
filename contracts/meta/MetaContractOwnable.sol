@@ -12,10 +12,11 @@ contract MetaContractOwnable is Ownable {
 
     Execution[] public executions;
 
-    function executeFunction(
-        address target,
-        bytes memory txData
-    ) external onlyOwner returns (bytes memory) {
+    function executeFunction(address target, bytes memory txData)
+        external
+        onlyOwner
+        returns (bytes memory)
+    {
         Execution memory execution = Execution(msg.sender, target, txData);
         executions.push(execution);
 
