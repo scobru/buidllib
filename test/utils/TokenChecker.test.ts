@@ -1,5 +1,6 @@
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
+import { ethers } from "hardhat";
+
+import { expect } from "chai";
 
 describe('TokenChecker', function () {
   let accounts: { address: any; }[],
@@ -43,7 +44,6 @@ describe('TokenChecker', function () {
     );
     expect(result).to.equal(false);
   });
-
 
   it('Should return true if the user owns the ERC721 token', async function () {
     const result = await tokenChecker.checkERC721Ownership(

@@ -4,7 +4,13 @@ Welcome to BuidlLib! This is a comprehensive library of smart contract utilities
 
 ## Features
 
+### contract/utils
+
 - **TokenChecker:** A utility contract that allows checking if a user holds or owns a certain amount of ERC20, ERC721 or ERC1155 tokens.
+
+### contract/finance
+
+- **Treasury:** A utility contract that allows withdrawing ERC20 and native Ether (ETH) tokens from a contract. This is useful for contracts that receive tokens and need to withdraw them to a specific address.
 
 ## Installation
 
@@ -46,6 +52,36 @@ contract MyContract is TokenChecker {
     }
 }
 
+```
+
+### Treasury
+
+Here is how you can use the TokenChecker contract:
+
+
+```solidity
+pragma solidity ^0.8.19;
+
+import "@scobru/buidllib/contracts/finance/Treasury.sol";
+
+contract MyContract is Treasury {
+    // Example implementation using Treasury
+    
+    // Function to withdraw tokens from the Treasury contract
+    function withdrawTokensFromTreasury(address _token, address _to, uint256 _amount) public onlyOwner {
+        withdrawTokens(_token, _to, _amount);
+    }
+    
+    // Function to withdraw native Ether (ETH) from the Treasury contract
+    function withdrawNativeFromTreasury(address payable _to, uint256 _amount) public onlyOwner {
+        withdrawNative(_to, _amount);
+    }
+    
+    // Function to receive Ether in the contract
+    receive() external payable {
+        // Custom logic for handling received Ether
+    }    
+}
 ```
 
 ## Future Development
