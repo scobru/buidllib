@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var hardhat_1 = require("hardhat");
 var chai_1 = require("chai");
-describe("Treasury", function () {
+describe('Treasury', function () {
     var provider = hardhat_1.ethers.provider;
     var setup = function () { return __awaiter(void 0, void 0, void 0, function () {
         var _a, signer, other, Token, token, Treasury, treasury;
@@ -47,13 +47,13 @@ describe("Treasury", function () {
                 case 0: return [4 /*yield*/, hardhat_1.ethers.getSigners()];
                 case 1:
                     _a = _b.sent(), signer = _a[0], other = _a[1];
-                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory("MockERC20")];
+                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory('MockERC20')];
                 case 2:
                     Token = _b.sent();
-                    return [4 /*yield*/, Token.deploy(signer.address, hardhat_1.ethers.utils.parseEther("1000"))];
+                    return [4 /*yield*/, Token.deploy(signer.address, hardhat_1.ethers.utils.parseEther('1000'))];
                 case 3:
                     token = _b.sent();
-                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory("Treasury")];
+                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory('Treasury')];
                 case 4:
                     Treasury = _b.sent();
                     return [4 /*yield*/, Treasury.deploy()];
@@ -63,7 +63,7 @@ describe("Treasury", function () {
             }
         });
     }); };
-    it("receives ETH correctly", function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('receives ETH correctly', function () { return __awaiter(void 0, void 0, void 0, function () {
         var _a, signer, treasury, value, balanceBefore, balanceAfter;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -86,7 +86,7 @@ describe("Treasury", function () {
             }
         });
     }); });
-    it("owner can send ETH correctly", function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('owner can send ETH correctly', function () { return __awaiter(void 0, void 0, void 0, function () {
         var _a, signer, other, treasury, value, balanceBefore, balanceAfter;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -119,14 +119,14 @@ describe("Treasury", function () {
                 case 1:
                     _a = _b.sent(), other = _a.other, treasury = _a.treasury;
                     tx = treasury.connect(other).withdrawNative(other.address, 0);
-                    return [4 /*yield*/, chai_1.expect(tx).to.be.revertedWith("Ownable: caller is not the owner")];
+                    return [4 /*yield*/, chai_1.expect(tx).to.be.revertedWith('Ownable: caller is not the owner')];
                 case 2:
                     _b.sent();
                     return [2 /*return*/];
             }
         });
     }); });
-    it("receives ERC20 correctly", function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('receives ERC20 correctly', function () { return __awaiter(void 0, void 0, void 0, function () {
         var _a, token, treasury, value, balanceBefore, balanceAfter;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -148,7 +148,7 @@ describe("Treasury", function () {
             }
         });
     }); });
-    it("owner can send ERC20 correctly", function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('owner can send ERC20 correctly', function () { return __awaiter(void 0, void 0, void 0, function () {
         var _a, signer, token, treasury, value, balanceBefore, balanceAfter;
         return __generator(this, function (_b) {
             switch (_b.label) {
@@ -180,8 +180,10 @@ describe("Treasury", function () {
                 case 0: return [4 /*yield*/, setup()];
                 case 1:
                     _a = _b.sent(), other = _a.other, token = _a.token, treasury = _a.treasury;
-                    tx = treasury.connect(other).withdrawTokens(token.address, other.address, 0);
-                    return [4 /*yield*/, chai_1.expect(tx).to.be.revertedWith("Ownable: caller is not the owner")];
+                    tx = treasury
+                        .connect(other)
+                        .withdrawTokens(token.address, other.address, 0);
+                    return [4 /*yield*/, chai_1.expect(tx).to.be.revertedWith('Ownable: caller is not the owner')];
                 case 2:
                     _b.sent();
                     return [2 /*return*/];

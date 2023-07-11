@@ -3,67 +3,63 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-abstract contract FeeManager is Ownable {
-    uint256 public ERC20FeeAmount;
-    uint256 public nativeFeeAmount;
+contract FeeManager is Ownable, ReentrancyGuard {
+    using SafeMath for uint256;
+
     IERC20 public feeToken;
     address payable public feeRecipient;
+    uint256 public feePercentage;
 
     event ERC20FeePaid(address from, address to, uint256 amount);
     event NativeFeePaid(address from, address to, uint256 amount);
 
-    modifier costsERC20Fee() {
+    modifier costsERC20Fee(uint256 _ERC20FeeAmount) {
         require(
-            feeToken.balanceOf(msg.sender) >= ERC20FeeAmount,
-            "Insufficient ERC20 fee balance"
+            feeToken.balanceOf(msg.sender) >= _ERC20FeeAmount,
+            "FeeManager: Insufficient ERC20 fee balance"
         );
         require(
-            feeToken.allowance(msg.sender, address(this)) >= ERC20FeeAmount,
-            "Fee not approved for transfer"
+            feeToken.allowance(msg.sender, address(this)) >= _ERC20FeeAmount,
+            "FeeManager: Fee not approved for transfer"
         );
         _;
-        _payERC20Fee();
     }
 
     modifier costsNativeFee() {
+        uint256 fee = (msg.value * feePercentage) / 10000;
         require(
-            msg.value >= nativeFeeAmount,
-            "Insufficient native fee balance"
+            msg.value >= fee,
+            "FeeManager: Insufficient native fee balance"
         );
         _;
-        _payNativeFee();
     }
 
     constructor(
         IERC20 _feeToken,
-        uint256 _ERC20FeeAmount,
-        uint256 _nativeFeeAmount,
-        address payable _feeRecipient
+        address payable _feeRecipient,
+        uint256 _feePercentage
     ) {
         require(
             _feeRecipient != address(0),
-            "Fee recipient cannot be zero address"
+            "FeeManager: Fee recipient cannot be zero address"
+        );
+        require(
+            _feePercentage <= 10000,
+            "FeeManager: Fee percentage must be between 0 and 10000"
         );
         feeToken = _feeToken;
-        ERC20FeeAmount = _ERC20FeeAmount;
-        nativeFeeAmount = _nativeFeeAmount;
         feeRecipient = _feeRecipient;
-    }
-
-    function setERC20FeeAmount(uint256 _ERC20FeeAmount) external onlyOwner {
-        ERC20FeeAmount = _ERC20FeeAmount;
-    }
-
-    function setNativeFeeAmount(uint256 _nativeFeeAmount) external onlyOwner {
-        nativeFeeAmount = _nativeFeeAmount;
+        feePercentage = _feePercentage;
     }
 
     function setFeeToken(IERC20 _feeToken) external onlyOwner {
         require(
             address(_feeToken) != address(0),
-            "Fee token cannot be zero address"
+            "FeeManager: Fee token cannot be zero address"
         );
         feeToken = _feeToken;
     }
@@ -71,18 +67,39 @@ abstract contract FeeManager is Ownable {
     function setFeeRecipient(address payable _feeRecipient) external onlyOwner {
         require(
             _feeRecipient != address(0),
-            "Fee recipient cannot be zero address"
+            "FeeManager: Fee recipient cannot be zero address"
         );
         feeRecipient = _feeRecipient;
     }
 
-    function _payERC20Fee() internal {
-        feeToken.transferFrom(msg.sender, feeRecipient, ERC20FeeAmount);
-        emit ERC20FeePaid(msg.sender, feeRecipient, ERC20FeeAmount);
+    function setFeePercentage(uint256 _feePercentage) external onlyOwner {
+        require(
+            _feePercentage <= 10000,
+            "FeeManager: Fee percentage must be between 0 and 10000"
+        );
+        feePercentage = _feePercentage;
     }
 
-    function _payNativeFee() internal {
-        payable(feeRecipient).transfer(nativeFeeAmount);
-        emit NativeFeePaid(msg.sender, feeRecipient, nativeFeeAmount);
+    function _payERC20Fee(uint256 ERC20FeeAmount) internal {
+        uint256 fee = (ERC20FeeAmount * feePercentage) / 10000;
+        feeToken.transferFrom(msg.sender, feeRecipient, fee);
+        emit ERC20FeePaid(msg.sender, feeRecipient, fee);
+    }
+
+    function _payNativeFee(uint256 fee) internal nonReentrant {
+        (bool success, ) = feeRecipient.call{ value: fee }("");
+        require(success, "FeeManager: Failed to transfer native fee");
+        emit NativeFeePaid(msg.sender, feeRecipient, fee);
+    }
+
+    function payNativeFee() external payable costsNativeFee {
+        uint256 fee = (msg.value * feePercentage) / 10000;
+        _payNativeFee(fee);
+    }
+
+    function payERC20Fee(
+        uint256 ERC20FeeAmount
+    ) external costsERC20Fee(ERC20FeeAmount) {
+        _payERC20Fee(ERC20FeeAmount);
     }
 }

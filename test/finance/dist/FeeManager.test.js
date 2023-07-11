@@ -38,62 +38,120 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var hardhat_1 = require("hardhat");
 var chai_1 = require("chai");
-describe("FeeManager", function () {
-    var _this = this;
-    var accounts;
-    var feeManager;
-    var mockERC20;
-    before(function () { return __awaiter(_this, void 0, void 0, function () {
-        var MockERC20, MockConcreteFeeManager;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+var provider = hardhat_1.ethers.provider;
+describe('FeeManager', function () {
+    var initialSupply = hardhat_1.ethers.utils.parseEther('1000');
+    var feePercentage = 1000; // 10%
+    var setup = function (mode) { return __awaiter(void 0, void 0, void 0, function () {
+        var _a, signer, other, Token, token, FeeManager, feeManager;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, hardhat_1.ethers.getSigners()];
                 case 1:
-                    accounts = _a.sent();
-                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory("MockERC20")];
+                    _a = _b.sent(), signer = _a[0], other = _a[1];
+                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory('MockERC20')];
                 case 2:
-                    MockERC20 = _a.sent();
-                    return [4 /*yield*/, MockERC20.deploy(accounts[0].address, hardhat_1.ethers.utils.parseEther("1000"))];
+                    Token = _b.sent();
+                    return [4 /*yield*/, Token.deploy(signer.address, initialSupply)];
                 case 3:
-                    mockERC20 = _a.sent();
-                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory("MockConcreteFeeManager")];
+                    token = _b.sent();
+                    return [4 /*yield*/, hardhat_1.ethers.getContractFactory('FeeManager')];
                 case 4:
-                    MockConcreteFeeManager = _a.sent();
-                    return [4 /*yield*/, MockConcreteFeeManager.deploy(mockERC20.address, hardhat_1.ethers.utils.parseEther("0.01"), hardhat_1.ethers.utils.parseEther("0.01"), accounts[1].address)];
+                    FeeManager = _b.sent();
+                    if (!(mode == 'native')) return [3 /*break*/, 7];
+                    return [4 /*yield*/, FeeManager.deploy(hardhat_1.ethers.constants.AddressZero, signer.address, feePercentage)];
                 case 5:
-                    feeManager = _a.sent();
+                    feeManager = _b.sent();
+                    return [4 /*yield*/, feeManager.deployed()];
+                case 6:
+                    _b.sent();
+                    return [3 /*break*/, 10];
+                case 7:
+                    if (!(mode == 'erc20')) return [3 /*break*/, 10];
+                    return [4 /*yield*/, FeeManager.deploy(token.address, signer.address, feePercentage)];
+                case 8:
+                    feeManager = _b.sent();
+                    return [4 /*yield*/, feeManager.deployed()];
+                case 9:
+                    _b.sent();
+                    _b.label = 10;
+                case 10: return [2 /*return*/, { signer: signer, other: other, token: token, feeManager: feeManager }];
+            }
+        });
+    }); };
+    it('pays native fee correctly', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var _a, signer, other, feeManager, initialBalance, initialBalanceSigner, tx, txReceipt, gasUsed, fee, amountSubFee, expectedBalance, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0: return [4 /*yield*/, setup('native')];
+                case 1:
+                    _a = _d.sent(), signer = _a.signer, other = _a.other, feeManager = _a.feeManager;
+                    return [4 /*yield*/, provider.getBalance(other.address)];
+                case 2:
+                    initialBalance = _d.sent();
+                    return [4 /*yield*/, provider.getBalance(signer.address)];
+                case 3:
+                    initialBalanceSigner = _d.sent();
+                    return [4 /*yield*/, feeManager.connect(other).payNativeFee({ value: hardhat_1.ethers.utils.parseEther('1') })];
+                case 4:
+                    tx = _d.sent();
+                    return [4 /*yield*/, tx.wait()];
+                case 5:
+                    txReceipt = _d.sent();
+                    gasUsed = txReceipt.gasUsed.mul(tx.gasPrice);
+                    fee = hardhat_1.ethers.utils.parseEther('1').mul(feePercentage).div(10000);
+                    amountSubFee = Number(hardhat_1.ethers.utils.parseEther('1')) * feePercentage / 10000;
+                    expectedBalance = initialBalance.sub(hardhat_1.ethers.utils.parseEther('1')).sub(gasUsed);
+                    _b = chai_1.expect;
+                    return [4 /*yield*/, provider.getBalance(other.address)];
+                case 6:
+                    _b.apply(void 0, [_d.sent()]).to.equal(expectedBalance);
+                    // Check feeRecipient's balance
+                    _c = chai_1.expect;
+                    return [4 /*yield*/, provider.getBalance(signer.address)];
+                case 7:
+                    // Check feeRecipient's balance
+                    _c.apply(void 0, [_d.sent()]).to.equal(String(initialBalanceSigner.add(String(amountSubFee))));
                     return [2 /*return*/];
             }
         });
     }); });
-    it("Should pay ERC20 fee", function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, mockERC20.approve(feeManager.address, hardhat_1.ethers.utils.parseEther("0.01"))];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, chai_1.expect(feeManager.triggerERC20Fee()).to.emit(feeManager, "ERC20FeePaid")];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
+    it('pays ERC20 fee correctly', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var _a, signer, other, token, feeManager, initialBalance, feeAmount, fee, expectedBalance, _b, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0: return [4 /*yield*/, setup('erc20')];
+                case 1:
+                    _a = _d.sent(), signer = _a.signer, other = _a.other, token = _a.token, feeManager = _a.feeManager;
+                    return [4 /*yield*/, token.balanceOf(signer.address)];
+                case 2:
+                    initialBalance = _d.sent();
+                    return [4 /*yield*/, token.transfer(other.address, initialBalance)];
+                case 3:
+                    _d.sent();
+                    feeAmount = hardhat_1.ethers.utils.parseEther('2');
+                    return [4 /*yield*/, token.connect(other).approve(feeManager.address, feeAmount)];
+                case 4:
+                    _d.sent();
+                    // Other pays ERC20 fee
+                    return [4 /*yield*/, feeManager.connect(other).payERC20Fee(feeAmount)];
+                case 5:
+                    // Other pays ERC20 fee
+                    _d.sent();
+                    fee = feeAmount.mul(feePercentage).div(10000);
+                    expectedBalance = initialBalance.sub(fee);
+                    _b = chai_1.expect;
+                    return [4 /*yield*/, token.balanceOf(other.address)];
+                case 6:
+                    _b.apply(void 0, [_d.sent()]).to.equal(expectedBalance);
+                    // Check feeRecipient's balance
+                    _c = chai_1.expect;
+                    return [4 /*yield*/, token.balanceOf(signer.address)];
+                case 7:
+                    // Check feeRecipient's balance
+                    _c.apply(void 0, [_d.sent()]).to.equal(fee);
+                    return [2 /*return*/];
+            }
         });
-    });
-    it("Should pay native fee", function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, chai_1.expect(function () { return feeManager.triggerNativeFee({ value: hardhat_1.ethers.utils.parseEther("0.01") }); }).to.changeEtherBalance(accounts[1], hardhat_1.ethers.utils.parseEther("0.01"))];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, chai_1.expect(feeManager.triggerNativeFee({ value: hardhat_1.ethers.utils.parseEther("0.01") })).to.emit(feeManager, "NativeFeePaid")];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    });
+    }); });
 });

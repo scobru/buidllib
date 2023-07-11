@@ -1,52 +1,95 @@
-import { ethers } from 'hardhat';
+import { ethers, } from 'hardhat';
 import { expect } from 'chai';
 
-describe('FeeManager', function () {
-  let accounts: any[];
-  let feeManager: {
-    address: any;
-    triggerERC20Fee: () => any;
-    triggerNativeFee: (arg0: { value: any }) => any;
+const { provider } = ethers;
+
+describe('FeeManager', () => {
+  const initialSupply = ethers.utils.parseEther('1000');
+  const feePercentage = 1000; // 10%
+
+  const setup = async (mode: string) => {
+    const [signer, other] = await ethers.getSigners();
+
+    const Token = await ethers.getContractFactory('MockERC20');
+    const token = await Token.deploy(
+      signer.address,
+      initialSupply
+    );
+
+    const FeeManager = await ethers.getContractFactory('FeeManager');
+    let feeManager: any;
+
+    if (mode == 'native') {
+      feeManager = await FeeManager.deploy(
+        ethers.constants.AddressZero,
+        signer.address,
+        feePercentage
+      );
+      await feeManager.deployed()
+
+    } else if (mode == 'erc20') {
+      feeManager = await FeeManager.deploy(
+        token.address,
+        signer.address,
+        feePercentage
+      );
+      await feeManager.deployed()
+    }
+
+    return { signer, other, token, feeManager };
   };
-  let mockERC20: { address: any; approve: (arg0: any, arg1: any) => any };
 
-  before(async () => {
-    accounts = await ethers.getSigners();
 
-    const MockERC20 = await ethers.getContractFactory('MockERC20');
-    mockERC20 = await MockERC20.deploy(
-      accounts[0].address,
-      ethers.utils.parseEther('1000')
-    );
+  it('pays native fee correctly', async () => {
+    const { signer, other, feeManager } = await setup('native');
 
-    const MockConcreteFeeManager = await ethers.getContractFactory(
-      'MockConcreteFeeManager'
-    );
-    feeManager = await MockConcreteFeeManager.deploy(
-      mockERC20.address,
-      ethers.utils.parseEther('0.01'),
-      ethers.utils.parseEther('0.01'),
-      accounts[1].address
-    );
+    const initialBalance = await provider.getBalance(other.address);
+    const initialBalanceSigner = await provider.getBalance(signer.address);
+
+    // User1 pays fee
+    const tx = await feeManager.connect(other).payNativeFee({ value: ethers.utils.parseEther('1') });
+
+    const txReceipt = await tx.wait();
+    const gasUsed = txReceipt.gasUsed.mul(tx.gasPrice);
+
+    // Fee calculation
+    const fee = ethers.utils.parseEther('1').mul(feePercentage).div(10000);
+
+    const amountSubFee = Number(ethers.utils.parseEther('1')) * feePercentage / 10000;
+
+    // Check new balance
+    const expectedBalance = initialBalance.sub(ethers.utils.parseEther('1')).sub(gasUsed);
+    expect(await provider.getBalance(other.address)).to.equal(expectedBalance);
+
+    // Check feeRecipient's balance
+    expect(await provider.getBalance(signer.address)).to.equal(String(initialBalanceSigner.add(String(amountSubFee))));
   });
 
-  it('Should pay ERC20 fee', async function () {
-    await mockERC20.approve(
-      feeManager.address,
-      ethers.utils.parseEther('0.01')
-    );
-    await expect(feeManager.triggerERC20Fee()).to.emit(
-      feeManager,
-      'ERC20FeePaid'
-    );
+  it('pays ERC20 fee correctly', async () => {
+    const { signer, other, token, feeManager } = await setup('erc20');
+
+    // Transfer some tokens to 'other' address
+    const initialBalance = await token.balanceOf(signer.address)
+    await token.transfer(other.address, initialBalance);
+
+    // Approve feeManager to spend 'other' tokens
+    const feeAmount = ethers.utils.parseEther('2');
+    await token.connect(other).approve(feeManager.address, feeAmount);
+
+    // Other pays ERC20 fee
+    await feeManager.connect(other).payERC20Fee(feeAmount);
+
+    // Fee calculation
+    const fee = feeAmount.mul(feePercentage).div(10000);
+
+    // Check 'other' balance
+    const expectedBalance = initialBalance.sub(fee);
+    expect(await token.balanceOf(other.address)).to.equal(expectedBalance);
+
+    // Check feeRecipient's balance
+    expect(await token.balanceOf(signer.address)).to.equal(fee);
   });
 
-  it('Should pay native fee', async function () {
-    await expect(() =>
-      feeManager.triggerNativeFee({ value: ethers.utils.parseEther('0.01') })
-    ).to.changeEtherBalance(accounts[1], ethers.utils.parseEther('0.01'));
-    await expect(
-      feeManager.triggerNativeFee({ value: ethers.utils.parseEther('0.01') })
-    ).to.emit(feeManager, 'NativeFeePaid');
-  });
+
+
 });
