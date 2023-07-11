@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -7,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 contract TokenChecker {
-    // MODIFIERS
-
     modifier requireERC20Balance(
         address tokenAddress,
         address accountAddress,
@@ -63,8 +60,6 @@ contract TokenChecker {
         _;
     }
 
-    // PUBLIC FUNCTIONS
-
     function checkERC20Balance(
         address tokenAddress,
         address accountAddress,
@@ -103,8 +98,6 @@ contract TokenChecker {
                 minBalance
             );
     }
-
-    // INTERNAL FUNCTIONS
 
     function _hasERC20Balance(
         address tokenAddress,

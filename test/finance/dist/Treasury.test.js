@@ -36,8 +36,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var expect = require("chai").expect;
 var hardhat_1 = require("hardhat");
+var chai_1 = require("chai");
 describe("Treasury", function () {
     var provider = hardhat_1.ethers.provider;
     var setup = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -80,8 +80,8 @@ describe("Treasury", function () {
                     return [4 /*yield*/, provider.getBalance(treasury.address)];
                 case 4:
                     balanceAfter = _b.sent();
-                    expect(balanceBefore).to.equal(0);
-                    expect(balanceAfter).to.equal(value);
+                    chai_1.expect(balanceBefore).to.equal(0);
+                    chai_1.expect(balanceAfter).to.equal(value);
                     return [2 /*return*/];
             }
         });
@@ -106,7 +106,7 @@ describe("Treasury", function () {
                     return [4 /*yield*/, provider.getBalance(other.address)];
                 case 5:
                     balanceAfter = _b.sent();
-                    expect(balanceAfter).to.equal(balanceBefore.add(value));
+                    chai_1.expect(balanceAfter).to.equal(balanceBefore.add(value));
                     return [2 /*return*/];
             }
         });
@@ -119,7 +119,7 @@ describe("Treasury", function () {
                 case 1:
                     _a = _b.sent(), other = _a.other, treasury = _a.treasury;
                     tx = treasury.connect(other).withdrawNative(other.address, 0);
-                    return [4 /*yield*/, expect(tx).to.be.revertedWith("Ownable: caller is not the owner")];
+                    return [4 /*yield*/, chai_1.expect(tx).to.be.revertedWith("Ownable: caller is not the owner")];
                 case 2:
                     _b.sent();
                     return [2 /*return*/];
@@ -143,7 +143,7 @@ describe("Treasury", function () {
                     return [4 /*yield*/, token.balanceOf(treasury.address)];
                 case 4:
                     balanceAfter = _b.sent();
-                    expect(balanceAfter).to.equal(balanceBefore.add(value));
+                    chai_1.expect(balanceAfter).to.equal(balanceBefore.add(value));
                     return [2 /*return*/];
             }
         });
@@ -168,7 +168,7 @@ describe("Treasury", function () {
                     return [4 /*yield*/, token.balanceOf(signer.address)];
                 case 5:
                     balanceAfter = _b.sent();
-                    expect(balanceAfter).to.equal(balanceBefore.add(value));
+                    chai_1.expect(balanceAfter).to.equal(balanceBefore.add(value));
                     return [2 /*return*/];
             }
         });
@@ -181,7 +181,7 @@ describe("Treasury", function () {
                 case 1:
                     _a = _b.sent(), other = _a.other, token = _a.token, treasury = _a.treasury;
                     tx = treasury.connect(other).withdrawTokens(token.address, other.address, 0);
-                    return [4 /*yield*/, expect(tx).to.be.revertedWith("Ownable: caller is not the owner")];
+                    return [4 /*yield*/, chai_1.expect(tx).to.be.revertedWith("Ownable: caller is not the owner")];
                 case 2:
                     _b.sent();
                     return [2 /*return*/];

@@ -6,11 +6,17 @@ Welcome to BuidlLib! This is a comprehensive library of smart contract utilities
 
 ### contract/utils
 
-- **TokenChecker:** A utility contract that allows checking if a user holds or owns a certain amount of ERC20, ERC721 or ERC1155 tokens.
+- **TokenChecker:** A utility contract that allows checking if a user holds or owns a certain amount of ERC20, ERC721, or ERC1155 tokens.
 
 ### contract/finance
 
 - **Treasury:** A utility contract that allows withdrawing ERC20 and native Ether (ETH) tokens from a contract. This is useful for contracts that receive tokens and need to withdraw them to a specific address.
+
+### contract/meta
+
+- **MetaContract:** A contract that enables executing functions on target contracts.
+- **MetaContractOwnable:** An extension of MetaContract that enforces that only the contract owner can execute functions.
+- **MetaContractChecker:** An extension of MetaContract that adds additional checks for ERC20, ERC721, and ERC1155 tokens before executing functions on target contracts.
 
 ## Installation
 
@@ -82,6 +88,79 @@ contract MyContract is Treasury {
         // Custom logic for handling received Ether
     }    
 }
+```
+
+### MetaContract
+
+Here is how you can use the MetaContract contract:
+
+```solidity
+
+pragma solidity 0.8.19;
+
+import "@scobru/buidllib/contracts/meta/MetaContract.sol";
+
+contract MyContract is MetaContract {
+    // Example implementation using MetaContract
+    
+    // Function to execute a function on the target contract
+    function executeOnTargetContract(address target, bytes memory txData) public returns (bytes memory) {
+        return executeFunction(target, txData);
+    }
+}
+```
+
+### MetaContractOwnable
+
+Here is how you can use the MetaContract contract:
+
+```solidity
+
+pragma solidity 0.8.19;
+
+import "@scobru/buidllib/contracts/meta/MetaContractOwnable.sol";
+
+contract MyContract is MetaContractOwnable {
+    // Example implementation using MetaContractOwnable
+    
+    // Function to execute a function on the target contract, restricted to contract owner
+    function executeOnTargetContract(address target, bytes memory txData) public onlyOwner returns (bytes memory) {
+        return executeFunction(target, txData);
+    }
+}
+```
+
+### MetaContractChecker
+
+Here is how you can use the MetaContract contract:
+
+```solidity
+pragma solidity 0.8.19;
+
+import "@scobru/buidllib/contracts/meta/MetaContractChecker.sol";
+
+contract MyContract is MetaContractChecker {
+    // Example implementation using MetaContractChecker
+    
+    // Function to execute a function on the target contract with ERC20 balance check
+    function executeOnTargetContractERC20Check(
+        address target,
+        bytes memory txData,
+        address tokenAddress,
+        address accountAddress,
+        uint256 minAmount
+    ) public returns (bytes memory) {
+        return executeFunction20Check(target, txData, tokenAddress, accountAddress, minAmount);
+    }
+    
+    // Function to execute a function on the target contract with ERC721 ownership check
+    function executeOnTargetContractERC721Check(
+        address target,
+        bytes memory txData,
+        address tokenAddress,
+        address accountAddress,
+        uint256 tokenId
+    ) public returns (bytes
 ```
 
 ## Future Development

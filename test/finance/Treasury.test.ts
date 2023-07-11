@@ -1,5 +1,5 @@
-const { expect } = require("chai");
 import { ethers, network } from "hardhat";
+import { expect } from "chai";
 
 describe("Treasury", () => {
     const { provider } = ethers;
