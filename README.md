@@ -11,6 +11,8 @@ Welcome to BuidlLib! This is a comprehensive library of smart contract utilities
 ### contract/finance
 
 - **Treasury:** A utility contract that allows withdrawing ERC20 and native Ether (ETH) tokens from a contract. This is useful for contracts that receive tokens and need to withdraw them to a specific address.
+- **FeeManager**  A utility contract to manage fees on transactions. It supports both native Ether (ETH) and ERC20 token fees.
+
 
 ### contract/meta
 
@@ -163,6 +165,31 @@ contract MyContract is MetaContractChecker {
     ) public returns (bytes
 ```
 
+## FeeManager
+
+Here is how you can use the FeeManager contract:
+
+```solidity
+pragma solidity ^0.8.19;
+
+import "@scobru/buidllib/contracts/finance/FeeManager.sol";
+
+contract MyContract is FeeManager {
+    // Example implementation using FeeManager
+
+    // Initialize FeeManager with specific fee token and fee recipient
+    constructor(address _feeToken, address _feeRecipient, uint256 _feePercentage) FeeManager(_feeToken, _feeRecipient, _feePercentage) {}
+
+    // Function to pay fees
+    function payFee() public payable {
+        payNativeFee(); // for native Ether
+        // or
+        payERC20Fee(amount); // for ERC20 tokens, requires prior approval
+    }
+}
+```
+
+
 ## Future Development
 
 We aim to expand this library with more utility contracts in the future. Keep an eye on our release notes and documentation for updates.
@@ -180,5 +207,3 @@ Before making a pull request, please make sure your changes are well-documented 
 ## License
 
 This project is licensed under the MIT License. Check out the LICENSE file in the root directory for more details.
-
-
