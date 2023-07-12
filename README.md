@@ -24,6 +24,7 @@ Welcome to BuidlLib! This is a comprehensive library of smart contract utilities
 
 - **Factory:** A contract that enables creating new contracts from a template contract.
 - **FactoryOwnable:** An extension of Factory that enforces that only the contract owner can create new contracts.
+- **FactoryFixedFee:** An extension of Factory that enforces a fixed fee for creating new contracts.
 
 ## Installation
 
@@ -200,9 +201,9 @@ contract MyContract is FeeManager {
 }
 ```
 
-### Factory and FactoryFixedFee
+### Factory, FactoryOwnable and FactoryFixedFee
 
-Located in the `contracts/factories` directory, `Factory` and `FactoryFixedFee` are utility contracts used for creating and managing other contracts. These are especially useful for building decentralized platforms and applications where new contracts need to be deployed frequently or in a standardized way.
+Located in the `contracts/factories` directory, `Factory`,`FactoryOwnable`and `FactoryFixedFee` are utility contracts used for creating and managing other contracts. These are especially useful for building decentralized platforms and applications where new contracts need to be deployed frequently or in a standardized way.
 
 #### Factory
 
@@ -221,6 +222,8 @@ contract MyFactory is Factory {
     }
 }
 ```
+
+FactoryOwnable is very similar to Factory, but only the owner can create new contracts. To use the FactoryOwnable contract, you need to implement the _createContract function. Here is an example:
 
 #### FactoryFixedFee
 
