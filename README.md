@@ -20,6 +20,11 @@ Welcome to BuidlLib! This is a comprehensive library of smart contract utilities
 - **MetaContractOwnable:** An extension of MetaContract that enforces that only the contract owner can execute functions.
 - **MetaContractChecker:** An extension of MetaContract that adds additional checks for ERC20, ERC721, and ERC1155 tokens before executing functions on target contracts.
 
+### contract/factories
+
+- **Factory:** A contract that enables creating new contracts from a template contract.
+- **FactoryOwnable:** An extension of Factory that enforces that only the contract owner can create new contracts.
+
 ## Installation
 
 You can install the library via npm:
@@ -189,6 +194,56 @@ contract MyContract is FeeManager {
 }
 ```
 
+### Factory and FactoryFixedFee
+
+Located in the `contracts/factories` directory, `Factory` and `FactoryFixedFee` are utility contracts used for creating and managing other contracts. These are especially useful for building decentralized platforms and applications where new contracts need to be deployed frequently or in a standardized way.
+
+#### Factory
+
+`Factory` is an abstract contract that provides a framework for deploying new contracts. A specific implementation of the `Factory` contract can define the logic for creating a new contract in the `_createContract` function.
+
+To use the `Factory` contract, you need to implement the `_createContract` function. Here is an example:
+
+```solidity
+pragma solidity ^0.8.19;
+
+import "@scobru/buidllib/contracts/factories/Factory.sol";
+
+contract MyFactory is Factory {
+    function _createContract() internal override returns (address) {
+        // Define logic to deploy a new contract and return its address
+    }
+}
+```
+
+#### FactoryFixedFee
+
+FactoryFixedFee extends the Factory contract to add support for charging a fixed fee for creating a new contract. The contract creator must send the exact fee amount in order for the contract creation transaction to succeed. The fee is then transferred to the owner of the FactoryFixedFee contract.
+
+To use the FactoryFixedFee contract, you need to implement the _createContract function. Here is an example:
+
+```solidity
+pragma solidity ^0.8.19;
+
+import "@scobru/buidllib/contracts/factories/FactoryFixedFee.sol";
+
+contract MyFactoryFixedFee is FactoryFixedFee {
+    constructor(address _owner, uint256 _fixedFee) FactoryFixedFee(_owner, _fixedFee) {}
+
+    function _createContract() internal override returns (address) {
+        // Define logic to deploy a new contract and return its address
+    }
+}
+```
+
+In both Factory and FactoryFixedFee, the _createContract function should contain the logic to deploy the specific type of contract that you want the factory to create. This function will be called when a user calls the createContract function.
+
+Please refer to the full contract documentation for more detailed information on how to use these contracts.
+
+
+## Documentation
+
+For more detailed information on how to use this library, please refer to the open in your browser [documentation](./docs/index.html).
 
 ## Future Development
 
