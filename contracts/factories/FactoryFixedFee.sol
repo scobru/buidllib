@@ -41,10 +41,6 @@ abstract contract FactoryFixedFee is Ownable, FixedFee {
         return _contractAddress;
     }
 
-    function createContract(
-        address creator
-    ) public payable virtual returns (address);
-
     function getContracts() public view returns (address[] memory) {
         return contracts;
     }

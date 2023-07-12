@@ -9,9 +9,7 @@ contract MockFactoryFixedFee is FactoryFixedFee {
         uint256 _fixedFee
     ) FactoryFixedFee(_owner, _fixedFee) {}
 
-    function createContract(
-        address creator
-    ) public payable override returns (address) {
+    function createContract(address creator) public payable returns (address) {
         MockTargetContract simpleStorage = new MockTargetContract();
         _createContract(address(simpleStorage));
         emit ContractCreated(address(simpleStorage), creator);

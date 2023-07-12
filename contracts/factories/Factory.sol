@@ -38,8 +38,6 @@ abstract contract Factory is Ownable {
         return _contractAddress;
     }
 
-    function createContract(address creator) public virtual returns (address);
-
     function getContracts() public view returns (address[] memory) {
         return contracts;
     }

@@ -220,7 +220,7 @@ import "./MockTargetContract.sol";
 contract MyFactory is Factory {
     constructor(address _owner) Factory(_owner) {}
 
-    function createContract(address creator) public override returns (address) {
+    function createContract(address creator) public returns (address) {
         MockTargetContract simpleStorage = new MockTargetContract();
         _createContract(address(simpleStorage));
         emit ContractCreated(address(simpleStorage), creator);
@@ -251,7 +251,7 @@ contract MockFactoryFixedFee is FactoryFixedFee {
 
     function createContract(
         address creator
-    ) public payable override returns (address) {
+    ) public payable returns (address) {
         MockTargetContract targetContract = new MockTargetContract();
         _createContract(address(targetContract));
         emit ContractCreated(address(targetContract), creator);
