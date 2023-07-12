@@ -30,7 +30,13 @@ Welcome to BuidlLib! This is a comprehensive library of smart contract utilities
 You can install the library via npm:
 
 ```bash
-npm install @scobru/buidllib
+yarn add @scobru/buidllib
+```
+
+Run all tests:
+
+```bash
+yarn test:coverage @scobru/buidllib
 ```
 
 ## Usage
