@@ -134,7 +134,7 @@ describe("FactoryFixedFee", function () {
                     case 0: return [4 /*yield*/, setup()];
                     case 1:
                         _a = _b.sent(), factory = _a.factory, owner = _a.owner;
-                        return [4 /*yield*/, chai_1.expect(factory.createContract(owner.address, { value: 50 })).to.be.revertedWith("fee is not correct")];
+                        return [4 /*yield*/, chai_1.expect(factory.createContract(owner.address)).to.be.revertedWith("fee is not correct")];
                     case 2:
                         _b.sent();
                         return [2 /*return*/];

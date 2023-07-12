@@ -7,10 +7,9 @@ import "./mockTargetContract.sol";
 contract MockFactory is Factory {
     constructor(address _owner) Factory(_owner) {}
 
-    function _createContract(
-        address creator
-    ) internal override returns (address) {
+    function createContract(address creator) public override returns (address) {
         MockTargetContract simpleStorage = new MockTargetContract();
+        _createContract(address(simpleStorage));
         emit ContractCreated(address(simpleStorage), creator);
         return address(simpleStorage);
     }

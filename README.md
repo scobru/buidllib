@@ -215,10 +215,16 @@ To use the `Factory` contract, you need to implement the `_createContract` funct
 pragma solidity ^0.8.19;
 
 import "@scobru/buidllib/contracts/factories/Factory.sol";
+import "./MockTargetContract.sol";
 
 contract MyFactory is Factory {
-    function _createContract() internal override returns (address) {
-        // Define logic to deploy a new contract and return its address
+    constructor(address _owner) Factory(_owner) {}
+
+    function createContract(address creator) public override returns (address) {
+        MockTargetContract simpleStorage = new MockTargetContract();
+        _createContract(address(simpleStorage));
+        emit ContractCreated(address(simpleStorage), creator);
+        return address(simpleStorage);
     }
 }
 ```
@@ -235,12 +241,21 @@ To use the FactoryFixedFee contract, you need to implement the _createContract f
 pragma solidity ^0.8.19;
 
 import "@scobru/buidllib/contracts/factories/FactoryFixedFee.sol";
+import "./MockTargetContract.sol"
 
-contract MyFactoryFixedFee is FactoryFixedFee {
-    constructor(address _owner, uint256 _fixedFee) FactoryFixedFee(_owner, _fixedFee) {}
+contract MockFactoryFixedFee is FactoryFixedFee {
+    constructor(
+        address _owner,
+        uint256 _fixedFee
+    ) FactoryFixedFee(_owner, _fixedFee) {}
 
-    function _createContract() internal override returns (address) {
-        // Define logic to deploy a new contract and return its address
+    function createContract(
+        address creator
+    ) public payable override returns (address) {
+        MockTargetContract targetContract = new MockTargetContract();
+        _createContract(address(targetContract));
+        emit ContractCreated(address(targetContract), creator);
+        return address(targetContract);
     }
 }
 ```

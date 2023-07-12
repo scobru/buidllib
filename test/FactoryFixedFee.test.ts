@@ -33,7 +33,7 @@ describe("FactoryFixedFee", function () {
 
     it("Should revert if creation fee is incorrect", async function () {
         const { factory, owner } = await setup();
-        await expect(factory.createContract(owner.address, { value: 50 })).to.be.revertedWith(
+        await expect(factory.createContract(owner.address)).to.be.revertedWith(
             "fee is not correct"
         );
     });

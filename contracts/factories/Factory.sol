@@ -22,27 +22,23 @@ abstract contract Factory is Ownable {
         _transferOwnership(_owner);
     }
 
-    function createContract(address _creator) public returns (address) {
+    function _createContract(
+        address _contractAddress
+    ) internal virtual returns (address) {
         contractCounter++;
+        contracts.push(_contractAddress);
 
-        address newContract = _createContract(_creator);
-
-        contracts.push(newContract);
-
-        createdContracts[newContract] = ContractInfo({
-            contractAddress: newContract,
-            creator: _creator,
+        createdContracts[_contractAddress] = ContractInfo({
+            contractAddress: _contractAddress,
+            creator: msg.sender,
             isActive: true
         });
 
-        emit ContractCreated(newContract, _creator);
-
-        return newContract;
+        emit ContractCreated(_contractAddress, msg.sender);
+        return _contractAddress;
     }
 
-    function _createContract(
-        address creator
-    ) internal virtual returns (address);
+    function createContract(address creator) public virtual returns (address);
 
     function getContracts() public view returns (address[] memory) {
         return contracts;

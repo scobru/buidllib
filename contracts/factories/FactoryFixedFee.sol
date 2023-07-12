@@ -23,30 +23,27 @@ abstract contract FactoryFixedFee is Ownable, FixedFee {
         _transferOwnership(_owner);
     }
 
-    function createContract(address _creator) public payable returns (address) {
+    function _createContract(
+        address _contractAddress
+    ) internal virtual returns (address) {
         require(msg.value == getCreationFee(), "fee is not correct");
         payable(owner()).transfer(msg.value);
-
         contractCounter++;
+        contracts.push(_contractAddress);
 
-        address newContract = _createContract(_creator);
-
-        contracts.push(newContract);
-
-        createdContracts[newContract] = ContractInfo({
-            contractAddress: newContract,
-            creator: _creator,
+        createdContracts[_contractAddress] = ContractInfo({
+            contractAddress: _contractAddress,
+            creator: msg.sender,
             isActive: true
         });
 
-        emit ContractCreated(newContract, _creator);
-
-        return newContract;
+        emit ContractCreated(_contractAddress, msg.sender);
+        return _contractAddress;
     }
 
-    function _createContract(
+    function createContract(
         address creator
-    ) internal virtual returns (address);
+    ) public payable virtual returns (address);
 
     function getContracts() public view returns (address[] memory) {
         return contracts;
